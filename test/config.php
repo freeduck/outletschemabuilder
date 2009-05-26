@@ -16,6 +16,9 @@
 *    You should have received a copy of the GNU General Public License
 *    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 */
-class OutletSchemaBuilderTestCase extends PHPUnit_Framework_TestCase{
-   function testGivenAConnectionArrayTheBuilderReturnsAOutletSchemaArray
+
+if(function_exists('xdebug_disable')){
+   xdebug_disable();
 }
+define('ROOT_PATH', realpath(dirname(__FILE__).'/..'));
+define('SHELLS_PATH',dirname(__FILE__).'/shells');

@@ -20,6 +20,9 @@
 class OutletSchemaBuilder{
    private $database;
    private $schema;
+   private $tableDefinition;
+   private $tableName;
+   private $className;
    function createWithDatabase($database){
       $builder = new OutletSchemaBuilder();
       $builder->initializeWithDatabase($database);
@@ -29,12 +32,13 @@ class OutletSchemaBuilder{
    protected function initializeWithDatabase($database){
       $this->database = $database;
       $this->schema = array();
+      $this->tableDefinition = array();
    }
    
    function createSchema(){
       $this->addConnection();
       $this->addClassDefinitions();
-      //$this->tables = $this->database->getTables
+      return $this->schema;
    }
 
    function addConnection(){
@@ -43,8 +47,85 @@ class OutletSchemaBuilder{
 
    function addClassDefinitions(){
       foreach($this->database->getTables() as $tableName){
-	 var_dump($tableName);
-	 $this->database->showCreateTable($tableName);
+	 $tableDefinitionString = $this->database->showCreateTable($tableName);
+	 $this->parseTableDefinitionString($tableDefinitionString);
+	 $this->addClassName();
+	 $this->setTableName();
+	 $this->addColumns();
+      }
+   }
+   function parseTableDefinitionString($tableDefinitionString){
+      $str = str_replace("\r", "", str_replace("\n", "", $tableDefinitionString));
+
+      $nameEnd = strpos($str, "(");
+      $namePart = substr($str, 0, $nameEnd);
+      $definition = substr($str, $nameEnd + 1);
+      $nameParts = explode('(', $str);
+
+      $metaStart = strrpos($definition, ")");
+      $columnDefinitions = substr($definition, 0, $metaStart);
+      $metaDefinitions = substr($definition, $metaStart + 1);
+      $columnMetaParts = explode(")", $nameParts[1]);
+      $this->tableDefinition = array_merge((array) $namePart, explode(",", $columnDefinitions)); 
+
+   }
+
+   function addClassName(){
+    
+      $this->tableName = $this->getTableName();
+      $this->className = ucfirst(strtolower($this->tableName));
+      $this->schema['classes'][$this->className] = array();
+   }
+
+   function getTableName(){
+      $nameLine = array_shift($this->tableDefinition);
+      return $this->extractIdentifierName($nameLine);
+   }
+
+   function extractIdentifierName($contentLine){
+      preg_match("/`([^`]+)`/", $contentLine, $matches);      
+      return $matches[1];
+   }
+
+   function setTableName(){
+      $this->schema['classes'][$this->className]['table'] = $this->tableName;
+   }
+
+   function addColumns(){
+      if(count($this->tableDefinition) > 0){
+	 $this->schema['classes'][$this->className]['props'] = array();
+	 foreach($this->tableDefinition as $columnDefinition){
+	    $columnLine = trim($columnDefinition);
+	    if($columnLine[0] == '`'){
+	       $this->addProperty($columnLine);
+	    }
+	    else{
+	       $this->addExtra($columnLine);
+	    }
+	 }
+      }
+   }
+
+   function addProperty($columnLine){
+      $property = $this->extractIdentifierName($columnLine);
+      $type = $this->extractType($columnLine);
+      $this->schema['classes'][$this->className]['props'][$property] = array($property, $type);
+   }
+
+   function extractType($columnLine){
+      $columnParts = explode(' ', $columnLine);
+      $typePart = trim($columnParts[1]);
+      $sizeStart = strpos($typePart, "(");
+      if($sizeStart !== false){
+	 $typePart = substr($typePart, 0, $sizeStart);
+      }
+      return $typePart;
+   }
+
+   function addExtra($columnLine){
+      if(strpos($columnLine, 'PRIMARY KEY') === 0){
+	 $pk = $this->extractIdentifierName($columnLine);
+	 $this->schema['classes'][$this->className]['props'][$pk][] = array('pk'=>true, 'autoIncrement'=>true);
       }
    }
 }

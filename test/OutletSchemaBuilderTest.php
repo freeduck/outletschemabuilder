@@ -30,7 +30,9 @@ class OutletSchemaBuilderTestCase extends PHPUnit_Framework_TestCase{
 
       $this->memberDefinition ="CREATE TABLE `member` (
  `id` int(11) NOT NULL auto_increment,
+\n
  `name` varchar(30) NOT NULL,
+\r
  `surname` varchar(30) NOT NULL,
  `description` text,
  `image_path` varchar(120) default NULL,
@@ -49,7 +51,13 @@ class OutletSchemaBuilderTestCase extends PHPUnit_Framework_TestCase{
    }
    function testGivenADatabaseObjectTheBuilderReturnsAOutletSchemaArray(){
       $builder = OutletSchemaBuilder::createWithDatabase($this->getDatabaseMock());
-      $builder->createSchema();
+      $schema = $builder->createSchema();
+      $this->assertEquals($this->connectionArray, $schema['connection']);
+      $this->assertEquals(2, count($schema['classes']));
+      $classNameArray = array_keys($schema['classes']);
+      $this->assertTrue(in_array('Member', $classNameArray), "Member is not in class schema");
+      $this->assertTrue(in_array('Player', $classNameArray), "Player is not in class schema");
+      $this->assertMember($schema['classes']['Member']);
    }
 
    function getDatabaseMock(){
@@ -63,17 +71,25 @@ class OutletSchemaBuilderTestCase extends PHPUnit_Framework_TestCase{
 	 method('getTables')->
 	 will($this->returnValue($this->tableArray));
 
-      $database->expects($this->once())->
+      $database->expects($this->exactly(2))->
 	 method('showCreateTable')->
-	 with('member')->
-	 will($this->returnValue($this->memberDefinition));
-
-      /*$database->expects($this->once())->
-	 method('showCreateTable')->
-	 with('player')->
-	 will($this->returnValue($this->playerDefinition));*/
-
-
+	 will($this->returnCallback(array($this,'showCreateTable')));
       return $database;
+   }
+
+   private function assertMember($memberArray){
+      $this->assertEquals('member', $memberArray['table']);
+      $this->assertEquals(array('id', 'int', array('pk'=>true, 'autoIncrement'=>true)), $memberArray['props']['id']);
+      $this->assertEquals(array('name', 'varchar'), $memberArray['props']['name']);
+      $this->assertEquals(array('surname', 'varchar'), $memberArray['props']['surname']);
+      $this->assertEquals(array('description', 'varchar'), $memberArray['props']['description']);
+   }
+
+   function showCreateTable($tableName){
+      $tableDefinition = $this->playerDefinition;
+      if($tableName == 'member'){
+	 $tableDefinition = $this->memberDefinition;
+      }
+      return $tableDefinition;
    }
 }
