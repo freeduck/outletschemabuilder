@@ -23,6 +23,8 @@ class OutletSchemaBuilder{
    private $tableDefinition;
    private $tableName;
    private $className;
+   private $mysqlOutletTypeMap;
+
    function createWithDatabase($database){
       $builder = new OutletSchemaBuilder();
       $builder->initializeWithDatabase($database);
@@ -33,6 +35,7 @@ class OutletSchemaBuilder{
       $this->database = $database;
       $this->schema = array();
       $this->tableDefinition = array();
+      $this->mysqlOutletTypeMap = array('varchar' => 'varchar', 'text' => 'varchar', 'int' => 'int', 'datetime' => 'datetime');
    }
    
    function createSchema(){
@@ -50,6 +53,7 @@ class OutletSchemaBuilder{
 	 $tableDefinitionString = $this->database->showCreateTable($tableName);
 	 $this->parseTableDefinitionString($tableDefinitionString);
 	 $this->addClassName();
+	 $this->setUseSettersAndGetters();
 	 $this->setTableName();
 	 $this->addColumns();
       }
@@ -75,6 +79,10 @@ class OutletSchemaBuilder{
       $this->tableName = $this->getTableName();
       $this->className = ucfirst(strtolower($this->tableName));
       $this->schema['classes'][$this->className] = array();
+   }
+
+   function setUseSettersAndGetters(){
+      $this->schema['classes'][$this->className]['useGettersAndSetters'] = true;
    }
 
    function getTableName(){
@@ -108,8 +116,12 @@ class OutletSchemaBuilder{
 
    function addProperty($columnLine){
       $property = $this->extractIdentifierName($columnLine);
-      $type = $this->extractType($columnLine);
-      $this->schema['classes'][$this->className]['props'][$property] = array($property, $type);
+      $type = $this->translateType($this->extractType($columnLine));
+      $this->schema['classes'][$this->className]['props'][$this->camelCase($property)] = array($property, $type);
+   }
+
+   function translateType($mysqlType){
+      return $this->mysqlOutletTypeMap[$mysqlType];
    }
 
    function extractType($columnLine){
@@ -122,10 +134,27 @@ class OutletSchemaBuilder{
       return $typePart;
    }
 
+   function camelCase($identifierName){
+      $identifierParts =explode('_', $identifierName);
+      $camelCasedName = strtolower(array_shift($identifierParts));
+      foreach($identifierParts as $namePart){
+	 $camelCasedName .= ucfirst(strtolower($namePart));
+      }
+      return $camelCasedName;
+   }
+
    function addExtra($columnLine){
       if(strpos($columnLine, 'PRIMARY KEY') === 0){
 	 $pk = $this->extractIdentifierName($columnLine);
-	 $this->schema['classes'][$this->className]['props'][$pk][] = array('pk'=>true, 'autoIncrement'=>true);
+	 $this->schema['classes'][$this->className]['props'][$this->camelCase($pk)][] = array('pk'=>true, 'autoIncrement'=>true);
+      }
+      else{
+	 $foreignStart = strpos($columnLine, "FOREIGN KEY");
+	 $foreignEnd = strpos($columnLine, ")", $foreignStart);
+	 $localAttPart = substr($columnLine, $foreignStart, $foreignEnd - $foreignStart);
+	 $this->schema['classes'][$this->className]['associations'] = array(array(
+										  'one-to-one', 
+										  $this->extractIdentifierName($this->camelCase($localAttPart))));
       }
    }
 }

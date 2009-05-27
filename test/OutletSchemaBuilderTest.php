@@ -17,7 +17,7 @@
 *    along with Outletschemabuilder.  If not, see <http://www.gnu.org/licenses/>.
 */
 require_once (dirname(__FILE__).'/config.php');
-require_once (SHELLS_PATH.'/Database.php');
+require_once (SHELLS_PATH.'/DatabaseDescriptor.php');
 require_once (ROOT_PATH.'/OutletSchemaBuilder.php');
 class OutletSchemaBuilderTestCase extends PHPUnit_Framework_TestCase{
    function setUp(){
@@ -58,10 +58,11 @@ class OutletSchemaBuilderTestCase extends PHPUnit_Framework_TestCase{
       $this->assertTrue(in_array('Member', $classNameArray), "Member is not in class schema");
       $this->assertTrue(in_array('Player', $classNameArray), "Player is not in class schema");
       $this->assertMember($schema['classes']['Member']);
+      $this->assertPlayer($schema['classes']['Player']);
    }
 
    function getDatabaseMock(){
-      $database = $this->getMock('Database');
+      $database = $this->getMock('DatabaseDescriptor');
 
       $database->expects($this->once())->
 	 method('getConnectionArray')->
@@ -77,12 +78,27 @@ class OutletSchemaBuilderTestCase extends PHPUnit_Framework_TestCase{
       return $database;
    }
 
-   private function assertMember($memberArray){
+   protected function assertMember($memberArray){
       $this->assertEquals('member', $memberArray['table']);
       $this->assertEquals(array('id', 'int', array('pk'=>true, 'autoIncrement'=>true)), $memberArray['props']['id']);
       $this->assertEquals(array('name', 'varchar'), $memberArray['props']['name']);
       $this->assertEquals(array('surname', 'varchar'), $memberArray['props']['surname']);
       $this->assertEquals(array('description', 'varchar'), $memberArray['props']['description']);
+      $this->assertEquals(array('image_path', 'varchar'), $memberArray['props']['imagePath']);
+      $this->assertEquals(array('created_at', 'datetime'), $memberArray['props']['createdAt']);
+      $this->assertEquals(array('updated_at', 'datetime'), $memberArray['props']['updatedAt']);
+      $this->assertUseSettersAndGetters($memberArray);
+   }
+
+   protected function assertUseSettersAndGetters($classArray){
+      $this->assertEquals(true, $classArray['useGettersAndSetters']);
+   }
+
+   protected function assertPlayer($playerArray){
+      $this->assertEquals('player', $playerArray['table']);
+      $this->assertEquals(array('member_id', 'int', array('pk'=>true, 'autoIncrement'=>true)), $playerArray['props']['memberId']);
+      $this->assertEquals(array('number', 'int'), $playerArray['props']['number']);
+      $this->assertEquals(array(array('one-to-one', 'memberId')), $playerArray['associations']);
    }
 
    function showCreateTable($tableName){
