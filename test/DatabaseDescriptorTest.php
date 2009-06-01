@@ -2,10 +2,14 @@
 require_once dirname(__FILE__).'/config.php';
 require_once (ROOT_PATH.'/DatabaseDescriptor.php');
 class DatabaseDesriptorTestCase extends PHPUnit_Framework_TestCase{
-   function testTheDatabaseDescriptorWillAcceptAnyDerivativeOfPDOAsConnectionClassName(){
-      $pdoMock = $this->getMock('PDO',array(), array(), '', false, false);
-      $pdoInsight = new ReflectionObject($pdoMock);
-      $pdoMockClassname = $pdoInsight->getName();
-      $databaseDescriptor = new DatabaseDescriptor(array(), $pdoMockClassname);
+   function testGetTableNames(){
+      $databaseDescriptor = DatabaseDescriptor::createWithPdoHandler($this->getPdoMock());
+      $databaseDescriptio->getTableNames();
+   }
+
+
+   function getPdoMock(){
+      $pdoMock = $this->getMock('PdoHandler',array(), array(), '', false, false);
+      return $pdoMock;
    }
 }

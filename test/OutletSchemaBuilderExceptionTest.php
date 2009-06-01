@@ -16,9 +16,11 @@
 *    You should have received a copy of the GNU General Public License
 *    along with Outletschemabuilder.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-class DatabaseDescriptor{
-   function getConnectionArray(){}
-   function getTableNames(){}
-   function showCreateTable(){}
+require_once (dirname(__FILE__).'/config.php');
+require_once (ROOT_PATH.'/OutletSchemaBuilderException.php');
+class OutletSchemaBuilderExceptionTestCase extends PHPUnit_Framework_TestCase{
+   function testLockedConstructorMessage(){
+      $exception = OutletSchemabuilderException::createWithPattern(OutletSchemaBuilderException::ERROR_CONSTRUCTOR_LOCKED);
+      $this->assertEquals('You need to call the create method', $exception->getMessage());
+   }
 }

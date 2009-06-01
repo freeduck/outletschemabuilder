@@ -17,7 +17,7 @@
 *    along with Outletschemabuilder.  If not, see <http://www.gnu.org/licenses/>.
 */
 require_once (dirname(__FILE__).'/config.php');
-require_once (SHELLS_PATH.'/DatabaseDescriptor.php');
+require_once (ROOT_PATH.'/DatabaseDescriptor.php');
 require_once (ROOT_PATH.'/OutletSchemaBuilder.php');
 class OutletSchemaBuilderTestCase extends PHPUnit_Framework_TestCase{
    function setUp(){

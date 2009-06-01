@@ -17,8 +17,26 @@
 *    along with Outletschemabuilder.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-class DatabaseDescriptor{
-   function getConnectionArray(){}
-   function getTableNames(){}
-   function showCreateTable(){}
+class PdoHandler extends PDO{
+   private $dsn;
+   private $username;
+   private $password;
+
+   private static $legalConstructorCall;
+   function __construct(){
+      if(!self::$legalConstructorCall){
+	 throw OutletSchemaBuilderException::createWithPattern(OutletSchemaBuilderException::ERROR_CONSTRUCTOR_LOCKED);
+      }
+   }
+   public static function createWithConnectionArray($connectionArray) {
+      self::$legalConstructorCall = true;      
+      $handler = new __CLASS__;
+      $handler->initializeWithConnectionArray($connectionArray);
+      self::$legalConstructorCall = false;      
+      return $handler;
+   }
+
+   function initializeWithConnectionArray($connectionArray){
+      parent::__construct($connectionArray['dsn']);
+   }
 }

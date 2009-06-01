@@ -17,8 +17,3 @@
 *    along with Outletschemabuilder.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-class DatabaseDescriptor{
-   function getConnectionArray(){}
-   function getTableNames(){}
-   function showCreateTable(){}
-}
