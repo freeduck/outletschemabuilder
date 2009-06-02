@@ -31,7 +31,11 @@ class DatabaseDesriptorTestCase extends PHPUnit_Framework_TestCase{
    }
 
    function testGetTableNames(){
-  
+      $dbh = new PDO("mysql:host=localhost;dbname=mysql", "root", "rootpass");
+      $result = $dbh->query("show tables");
+      foreach($result as $row){
+	 var_dump($row);
+      }
       $this->pdoMock->expects($this->exactly(1))
 	 ->method('query')
 	 ->will($this->returnCallback(array($this, 'handleQueryCalls')));
@@ -40,7 +44,11 @@ class DatabaseDesriptorTestCase extends PHPUnit_Framework_TestCase{
    }
 
    function handleQueryCalls($query){
-      var_dump("QUERY: ".$query);
+      $result = array();
+      if("show tables" == strtolower($query)){
+	 $result[] = array("Tables_in_mysql", 'member');
+	 $result[] = array("Tables_in_mysql", 'player');
+      }
    }
 
 
