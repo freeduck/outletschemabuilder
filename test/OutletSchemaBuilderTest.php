@@ -19,6 +19,12 @@
 require_once (dirname(__FILE__).'/config.php');
 require_once (ROOT_PATH.'/DatabaseDescriptor.php');
 require_once (ROOT_PATH.'/OutletSchemaBuilder.php');
+
+class DatabaseDescriptorMock implements DatabaseDescriptor{
+   function getConnectionArray(){}
+   function getTableNames(){}
+   function showCreateTable(){}
+}
 class OutletSchemaBuilderTestCase extends PHPUnit_Framework_TestCase{
    function setUp(){
       $this->tableArray = array('member', 'player');
@@ -62,14 +68,14 @@ class OutletSchemaBuilderTestCase extends PHPUnit_Framework_TestCase{
    }
 
    function getDatabaseMock(){
-      $database = $this->getMock('DatabaseDescriptor');
+      $database = $this->getMock('DatabaseDescriptorMock');
 
       $database->expects($this->once())->
 	 method('getConnectionArray')->
 	 will($this->returnValue($this->connectionArray));
 
       $database->expects($this->once())->
-	 method('getTables')->
+	 method('getTableNames')->
 	 will($this->returnValue($this->tableArray));
 
       $database->expects($this->exactly(2))->

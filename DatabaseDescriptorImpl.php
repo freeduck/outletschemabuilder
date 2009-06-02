@@ -16,6 +16,29 @@
 *    You should have received a copy of the GNU General Public License
 *    along with Outletschemabuilder.  If not, see <http://www.gnu.org/licenses/>.
 */
-interface PdoHandler{
-   function query();
+class DatabaseDescriptorImpl{
+   private $pdoHandler;
+   
+   private function __construct(){
+   }
+
+   public static function createWithPdoHandler(PdoHandler $pdoHandler){
+      $descriptor = new DatabaseDescriptorImpl();
+      $descriptor->initializeWithPdoHandler($pdoHandler);
+      return $descriptor;
+   }
+
+   function initializeWithPdoHandler(PdoHandler $pdoHandler){
+      $this->pdoHandler = $pdoHandler;
+   }
+
+   function getConnectionArray(){
+   }
+
+   function getTableNames(){
+      $this->pdoHandler->query("SHOW TABLES");
+   }
+
+   function showCreateTable(){
+   }
 }

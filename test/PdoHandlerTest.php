@@ -18,6 +18,7 @@
 */
 require_once(dirname(__FILE__).'/config.php');
 require_once(ROOT_PATH.'/PdoHandler.php');
+require_once (ROOT_PATH.'/OutletSchemaBuilderException.php');
 define("SQLITE_DB_PATH", sys_get_temp_dir().'/dummydb.sqlite');
 class PdoHandlerTestCase extends PHPUnit_Framework_TestCase{
    const DB_PATH = SQLITE_DB_PATH;

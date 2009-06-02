@@ -16,6 +16,31 @@
 *    You should have received a copy of the GNU General Public License
 *    along with Outletschemabuilder.  If not, see <http://www.gnu.org/licenses/>.
 */
-interface PdoHandler{
-   function query();
+
+class OutletSchemaBuilderException extends  Exception{
+
+   const ERROR_CONSTRUCTOR_LOCKED = 'You need to call the create method';
+   private $pattern;
+   private $parameters;
+
+   public static function createWithPattern($pattern){
+      $exception = new OutletSchemaBuilderException();
+      $args = func_get_args();
+      $exception->pattern = array_shift($args);
+      $exception->parameters = $args;
+      $exception->initializeWithPatternAndParameters();
+      return $exception;
+   }
+
+   protected function initializeWithPatternAndParameters(){
+      parent::__construct($this->buildMessage());
+   }
+
+   protected function buildMessage(){
+      return vsprintf($this->pattern, $this->parameters);
+   }
+
+   function getPattern(){
+      return $this->pattern;
+   }
 }
