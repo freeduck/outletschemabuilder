@@ -17,7 +17,7 @@
 *    along with Outletschemabuilder.  If not, see <http://www.gnu.org/licenses/>.
 */
 require_once(dirname(__FILE__).'/config.php');
-require_once(ROOT_PATH.'/PdoHandler.php');
+require_once(ROOT_PATH.'/PdoHandlerImpl.php');
 require_once (ROOT_PATH.'/OutletSchemaBuilderException.php');
 define("SQLITE_DB_PATH", sys_get_temp_dir().'/dummydb.sqlite');
 class PdoHandlerTestCase extends PHPUnit_Framework_TestCase{
@@ -31,7 +31,7 @@ class PdoHandlerTestCase extends PHPUnit_Framework_TestCase{
    }
 
    function testImplementsPDO(){
-      $pdoHandler = PdoHandler::createWithConnectionArray($this->getConnectionArray());
+      $pdoHandler = PdoHandlerImpl::createWithConnectionArray($this->getConnectionArray());
       $this->assertTrue($pdoHandler instanceof PDO);
    }
 
@@ -40,7 +40,7 @@ class PdoHandlerTestCase extends PHPUnit_Framework_TestCase{
    }
 
    function testUsesConnectionArrayToInitializesPdo(){
-      $pdoHandler = PdoHandler::createWithConnectionArray($this->getConnectionArray());
+      $pdoHandler = PdoHandlerImpl::createWithConnectionArray($this->getConnectionArray());
       $result = $pdoHandler->exec('begin;create table info (id integer primary key, name text);commit');
       if($result === false){
 	 $this->fail($pdoHandler->errorInfo());
@@ -49,7 +49,7 @@ class PdoHandlerTestCase extends PHPUnit_Framework_TestCase{
 
    function testConstructorCanNotBeCalledDirectly(){
       try{
-	 $pdoHandler = new PdoHandler($this->getConnectionArray());
+	 $pdoHandler = new PdoHandlerImpl($this->getConnectionArray());
 	 $this->fail("Expects an OutletSchemaBuilderException to be thrown");
       }catch(OutletSchemaBuilderException $e){
 	 $this->assertEquals(OutletSchemaBuilderException::ERROR_CONSTRUCTOR_LOCKED, $e->getPattern());
