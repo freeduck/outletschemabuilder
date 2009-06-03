@@ -17,5 +17,5 @@
 *    along with Outletschemabuilder.  If not, see <http://www.gnu.org/licenses/>.
 */
 interface PdoHandler{
-   function query();
+   function query2();
 }

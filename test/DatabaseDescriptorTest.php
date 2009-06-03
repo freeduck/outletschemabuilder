@@ -21,21 +21,24 @@ require_once (ROOT_PATH.'/DatabaseDescriptorImpl.php');
 require_once (ROOT_PATH.'/PdoHandler.php');
 
 class PdoHandlerMock implements PdoHandler{
+   function query2(){
+   }
+
    function query(){
    }
 }
 
 class DatabaseDesriptorTestCase extends PHPUnit_Framework_TestCase{
    function setUp(){
-      $this->pdoMock = $this->getMock('PdoHandler',array(), array(), '', false, false);
+      $this->pdoMock = $this->getMock('PdoHandlerMock');
    }
 
    function testGetTableNames(){
-      $dbh = new PDO("mysql:host=localhost;dbname=mysql", "root", "rootpass");
+      /*$dbh = new PDO("mysql:host=localhost;dbname=mysql", "root", "rootpass");
       $result = $dbh->query("show tables");
       foreach($result as $row){
 	 var_dump($row);
-      }
+	 }*/
       $this->pdoMock->expects($this->exactly(1))
 	 ->method('query')
 	 ->will($this->returnCallback(array($this, 'handleQueryCalls')));
