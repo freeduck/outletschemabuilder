@@ -21,9 +21,6 @@ require_once (ROOT_PATH.'/DatabaseDescriptorImpl.php');
 require_once (ROOT_PATH.'/PdoHandler.php');
 
 class PdoHandlerMock implements PdoHandler{
-   function query2(){
-   }
-
    function query(){
    }
 }
