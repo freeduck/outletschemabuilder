@@ -17,7 +17,7 @@
 *    along with Outletschemabuilder.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-class PdoHandlerImpl extends PDO{
+class PdoHandlerImpl extends PDO implements PdoHandler{
    private $dsn;
    private $username;
    private $password;
@@ -40,4 +40,5 @@ class PdoHandlerImpl extends PDO{
    function initializeWithConnectionArray($connectionArray){
       parent::__construct($connectionArray['dsn']);
    }
+
 }

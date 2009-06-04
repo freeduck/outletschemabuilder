@@ -20,37 +20,68 @@ require_once (dirname(__FILE__).'/config.php');
 require_once (ROOT_PATH.'/DatabaseDescriptorImpl.php');
 require_once (ROOT_PATH.'/PdoHandler.php');
 
-class PdoHandlerMock implements PdoHandler{
-   function query(){
-   }
-}
 
 class DatabaseDesriptorTestCase extends PHPUnit_Framework_TestCase{
    function setUp(){
-      $this->pdoMock = $this->getMock('PdoHandlerMock');
+      $this->pdoMock = $this->getMock('PdoHandler');
+      $this->memberDefinition ="CREATE TABLE `member` (
+ `id` int(11) NOT NULL auto_increment,
+\n
+ `name` varchar(30) NOT NULL,
+\r
+ `surname` varchar(30) NOT NULL,
+ `description` text,
+ `image_path` varchar(120) default NULL,
+ `created_at` datetime default NULL,
+ `updated_at` datetime default NULL,
+ PRIMARY KEY  (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=latin1";
+
+      $this->playerDefinition = "CREATE TABLE `player` (
+ `member_id` int(11) NOT NULL,
+ `number` int(11) default NULL,
+ PRIMARY KEY  (`member_id`),
+ CONSTRAINT `player_FK_1` FOREIGN KEY (`member_id`) REFERENCES `member` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1";
    }
 
    function testGetTableNames(){
-      /*$dbh = new PDO("mysql:host=localhost;dbname=mysql", "root", "rootpass");
-      $result = $dbh->query("show tables");
-      foreach($result as $row){
-	 var_dump($row);
-	 }*/
       $this->pdoMock->expects($this->exactly(1))
 	 ->method('query')
-	 ->will($this->returnCallback(array($this, 'handleQueryCalls')));
+	 ->will($this->returnCallback(array($this, 'handleTablesQuery')));
       $databaseDescriptor = DatabaseDescriptorImpl::createWithPdoHandler($this->getPdoMock());
-      $databaseDescriptor->getTableNames();
+      $tableNames = $databaseDescriptor->getTableNames();
+      $this->assertEquals(2, count($tableNames));
+      $this->assertTrue(in_array('member', $tableNames));
+      $this->assertTrue(in_array('player', $tableNames));
    }
 
-   function handleQueryCalls($query){
+   function testShowCreateTable(){
+      $this->pdoMock->expects($this->exactly(1))
+	 ->method('query')
+	 ->will($this->returnCallback(array($this, 'handleCreateMemberQuery')));
+      $databaseDescriptor = DatabaseDescriptorImpl::createWithPdoHandler($this->getPdoMock());
+      $this->assertEquals($this->memberDefinition, $databaseDescriptor->showCreateTable('member'));
+   }
+
+   function handleTablesQuery($query){
       $result = array();
       if("show tables" == strtolower($query)){
-	 $result[] = array("Tables_in_mysql", 'member');
-	 $result[] = array("Tables_in_mysql", 'player');
+	 $result[] = array("Tables_in_mysql" => 'member');
+	 $result[] = array("Tables_in_mysql" => 'player');
       }
+      return $result;
    }
 
+   function handleCreateMemberQuery($query){
+      if(strpos(strtolower($query), "show create table member") !== false){
+	 $pdoStatement = $this->getMock('PDOStatement', array(), array(), '', false);
+	 $pdoStatement->expects($this->once())
+	    ->method('fetch')
+	    ->will($this->returnValue(array("Create Table" => $this->memberDefinition)));
+      }
+      return $pdoStatement;
+   }
 
    function getPdoMock(){
 

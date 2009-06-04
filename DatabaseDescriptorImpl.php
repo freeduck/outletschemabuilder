@@ -36,9 +36,17 @@ class DatabaseDescriptorImpl{
    }
 
    function getTableNames(){
-      $this->pdoHandler->query("SHOW TABLES");
+      $tableNames = array();
+      $result = $this->pdoHandler->query("SHOW TABLES");
+      foreach($result as $row){
+	 $tableNames[] = $row['Tables_in_mysql'];
+      }
+      return $tableNames;
    }
 
-   function showCreateTable(){
+   function showCreateTable($tableName){
+      $result = $this->pdoHandler->query("SHOW CREATE TABLE ".$tableName);
+      $row = $result->fetch();
+      return $row["Create Table"];
    }
 }
