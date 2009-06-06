@@ -19,4 +19,6 @@
 interface PdoHandler{
    function query();
    function getDsn();
+   function getUsername();
+   function getPassword();
 }

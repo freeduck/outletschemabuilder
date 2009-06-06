@@ -17,6 +17,7 @@
 *    along with Outletschemabuilder.  If not, see <http://www.gnu.org/licenses/>.
 */
 require_once(dirname(__FILE__).'/config.php');
+require_once(ROOT_PATH.'/PdoHandler.php');
 require_once(ROOT_PATH.'/PdoHandlerImpl.php');
 require_once (ROOT_PATH.'/OutletSchemaBuilderException.php');
 define("SQLITE_DB_PATH", sys_get_temp_dir().'/dummydb.sqlite');
@@ -40,9 +41,7 @@ class PdoHandlerTestCase extends PHPUnit_Framework_TestCase{
       $this->assertTrue($pdoHandler instanceof PdoHandler);
    }
 
-   function getConnectionArray(){
-      return $this->connectionArray;
-   }
+
 
    function testUsesConnectionArrayToInitializesPdo(){
       $pdoHandler = PdoHandlerImpl::createWithConnectionArray($this->getConnectionArray());
@@ -62,9 +61,36 @@ class PdoHandlerTestCase extends PHPUnit_Framework_TestCase{
    }
 
    function testGetUsername(){
+      $localConnectionArray = $this->getConnectionArrayWithUser();
+      $pdoHandler = PdoHandlerImpl::createWithConnectionArray($localConnectionArray);
+      $this->assertEquals($localConnectionArray['username'], $pdoHandler->getUsername());      
+   }
+
+   function testGetPassword(){
+      $localConnectionArray = $this->getConnectionArrayWithCredentials();
+      $pdoHandler = PdoHandlerImpl::createWithConnectionArray($localConnectionArray);
+      $this->assertEquals($localConnectionArray['password'], $pdoHandler->getPassword());      
+   }
+
+   function testGetDsn(){
       $localConnectionArray = $this->getConnectionArray();
-      $pdoHandler = PdoHandlerImpl::createWithConnectionArray($this->getConnectionArray());
-      $this->assertEquals($localConnectionArray['username'], $pdoHandler->getUsername());
-      
+      $pdoHandler = PdoHandlerImpl::createWithConnectionArray($localConnectionArray);
+      $this->assertEquals($localConnectionArray['dsn'], $pdoHandler->getDsn());      
+   }
+
+   function getConnectionArrayWithCredentials(){
+      $connectionArray = $this->getConnectionArrayWithUser();
+      $connectionArray['password'] = 'userpass';
+      return $connectionArray;
+   }
+
+   function getConnectionArrayWithUser(){
+      $connectionArray = $this->getConnectionArray();
+      $connectionArray['username'] = 'user';
+      return $connectionArray;
+   }
+
+   function getConnectionArray(){
+      return $this->connectionArray;
    }
 }

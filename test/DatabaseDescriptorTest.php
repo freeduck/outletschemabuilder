@@ -71,7 +71,7 @@ class DatabaseDesriptorTestCase extends PHPUnit_Framework_TestCase{
    }
 
    function testGetConnectionArray(){
-      $pdoMock = $this->getMock('PdoHandler', array('getDsn', 'query', 'getUsername', 'getPassword'));
+      $pdoMock = $this->getMock('PdoHandler');
       $pdoMock->expects($this->once())
 	 ->method('getDsn')
 	 ->will($this->returnValue('mysql:host=localhost;dbname=mydb'));

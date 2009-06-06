@@ -38,13 +38,31 @@ class PdoHandlerImpl extends PDO implements PdoHandler{
    }
 
    function initializeWithConnectionArray($connectionArray){
-      parent::__construct($connectionArray['dsn']);
+      $this->dsn = $connectionArray['dsn'];
+      $this->username = $connectionArray['username'];
+      $this->password = $connectionArray['password'];
+      if($this->username){
+	 if($this->password){
+	    parent::__construct($connectionArray['dsn'], $this->username, $this->password);
+	 }
+	 else{
+	    parent::__construct($connectionArray['dsn'], $this->username);
+	 }
+      }
+      else{
+	    parent::__construct($connectionArray['dsn']);
+      }
    }
 
    function getDsn(){
+      return $this->dsn;
    }
 
    function getUsername(){
       return $this->username;
+   }
+   
+   function getPassword(){
+      return $this->password;
    }
 }
