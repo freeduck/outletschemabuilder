@@ -2,5 +2,5 @@
 interface DatabaseDescriptor{   
    function getConnectionArray();
    function getTableNames();
-   function showCreateTable();
+   function showCreateTable($tableName);
 }

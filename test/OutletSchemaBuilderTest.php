@@ -23,7 +23,7 @@ require_once (ROOT_PATH.'/OutletSchemaBuilder.php');
 class DatabaseDescriptorMock implements DatabaseDescriptor{
    function getConnectionArray(){}
    function getTableNames(){}
-   function showCreateTable(){}
+   function showCreateTable($tableName){}
 }
 class OutletSchemaBuilderTestCase extends PHPUnit_Framework_TestCase{
    function setUp(){

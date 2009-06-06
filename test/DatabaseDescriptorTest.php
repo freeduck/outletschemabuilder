@@ -17,6 +17,7 @@
 *    along with Outletschemabuilder.  If not, see <http://www.gnu.org/licenses/>.
 */
 require_once (dirname(__FILE__).'/config.php');
+require_once (ROOT_PATH.'/DatabaseDescriptor.php');
 require_once (ROOT_PATH.'/DatabaseDescriptorImpl.php');
 require_once (ROOT_PATH.'/PdoHandler.php');
 
@@ -45,6 +46,11 @@ class DatabaseDesriptorTestCase extends PHPUnit_Framework_TestCase{
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1";
    }
 
+   function testImplementsDatabaseDescriptor(){
+      $descriptor = DatabaseDescriptorImpl::createWithPdoHandler($this->pdoMock);
+      $this->assertType('DatabaseDescriptor', $descriptor);
+   }
+
    function testGetTableNames(){
       $this->pdoMock->expects($this->exactly(1))
 	 ->method('query')
@@ -62,6 +68,22 @@ class DatabaseDesriptorTestCase extends PHPUnit_Framework_TestCase{
 	 ->will($this->returnCallback(array($this, 'handleCreateMemberQuery')));
       $databaseDescriptor = DatabaseDescriptorImpl::createWithPdoHandler($this->getPdoMock());
       $this->assertEquals($this->memberDefinition, $databaseDescriptor->showCreateTable('member'));
+   }
+
+   function testGetConnectionArray(){
+      $pdoMock = $this->getMock('PdoHandler', array('getDsn', 'query', 'getUsername', 'getPassword'));
+      $pdoMock->expects($this->once())
+	 ->method('getDsn')
+	 ->will($this->returnValue('mysql:host=localhost;dbname=mydb'));
+      $pdoMock->expects($this->once())
+	 ->method('getUsername')
+	 ->will($this->returnValue('user'));
+      $pdoMock->expects($this->once())
+	 ->method('getPassword')
+	 ->will($this->returnValue('userpass'));
+      $descriptor = DatabaseDescriptorImpl::createWithPdoHandler($pdoMock);
+      $connectionArray = $descriptor->getConnectionArray();
+      $this->assertEquals(array('dsn' => 'mysql:host=localhost;dbname=mydb', 'username' => 'user', 'password' => 'userpass'), $connectionArray);
    }
 
    function handleTablesQuery($query){

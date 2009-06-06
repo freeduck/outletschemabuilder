@@ -35,6 +35,11 @@ class PdoHandlerTestCase extends PHPUnit_Framework_TestCase{
       $this->assertTrue($pdoHandler instanceof PDO);
    }
 
+   function testImplementsPdoHandler(){
+      $pdoHandler = PdoHandlerImpl::createWithConnectionArray($this->getConnectionArray());
+      $this->assertTrue($pdoHandler instanceof PdoHandler);
+   }
+
    function getConnectionArray(){
       return $this->connectionArray;
    }
@@ -54,5 +59,12 @@ class PdoHandlerTestCase extends PHPUnit_Framework_TestCase{
       }catch(OutletSchemaBuilderException $e){
 	 $this->assertEquals(OutletSchemaBuilderException::ERROR_CONSTRUCTOR_LOCKED, $e->getPattern());
       }
+   }
+
+   function testGetUsername(){
+      $localConnectionArray = $this->getConnectionArray();
+      $pdoHandler = PdoHandlerImpl::createWithConnectionArray($this->getConnectionArray());
+      $this->assertEquals($localConnectionArray['username'], $pdoHandler->getUsername());
+      
    }
 }

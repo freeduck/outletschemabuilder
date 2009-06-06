@@ -18,4 +18,5 @@
 */
 interface PdoHandler{
    function query();
+   function getDsn();
 }

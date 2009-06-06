@@ -16,7 +16,7 @@
 *    You should have received a copy of the GNU General Public License
 *    along with Outletschemabuilder.  If not, see <http://www.gnu.org/licenses/>.
 */
-class DatabaseDescriptorImpl{
+class DatabaseDescriptorImpl implements DatabaseDescriptor{
    private $pdoHandler;
    
    private function __construct(){
@@ -33,6 +33,11 @@ class DatabaseDescriptorImpl{
    }
 
    function getConnectionArray(){
+      $connectionArray = array();
+      $connectionArray['dsn'] = $this->pdoHandler->getDsn();
+      $connectionArray['username'] = $this->pdoHandler->getUsername();
+      $connectionArray['password'] = $this->pdoHandler->getPassword();
+      return $connectionArray;
    }
 
    function getTableNames(){
