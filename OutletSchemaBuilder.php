@@ -49,7 +49,8 @@ class OutletSchemaBuilder{
    }
 
    function addClassDefinitions(){
-      foreach($this->database->getTableNames() as $tableName){
+      $tableNames = $this->database->getTableNames();
+      foreach($tableNames as $tableName){
 	 $tableDefinitionString = $this->database->showCreateTable($tableName);
 	 $this->parseTableDefinitionString($tableDefinitionString);
 	 $this->addClassName();
