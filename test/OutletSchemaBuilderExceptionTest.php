@@ -23,4 +23,9 @@ class OutletSchemaBuilderExceptionTestCase extends PHPUnit_Framework_TestCase{
       $exception = OutletSchemabuilderException::createWithPattern(OutletSchemaBuilderException::ERROR_CONSTRUCTOR_LOCKED);
       $this->assertEquals('You need to call the create method', $exception->getMessage());
    }
+
+   function testNoFilaNameGiven(){
+      $exception = OutletSchemaBuilderException::createWithPattern(OutletSchemaBuilderException::ERROR_NO_FILE_NAME_GIVEN);
+      $this->assertEquals('You need to give a file name, empty strings are not allowed', $exception->getMessage());
+   }
 }

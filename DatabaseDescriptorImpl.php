@@ -50,8 +50,15 @@ class DatabaseDescriptorImpl implements DatabaseDescriptor{
    }
 
    function showCreateTable($tableName){
+      $this->assertTableName($tableName);
       $result = $this->pdoHandler->query("SHOW CREATE TABLE ".$tableName);
       $row = $result->fetch();
       return $row["Create Table"];
+   }
+
+   protected function assertTableName($tableName){
+      if(strlen($tableName) == 0){
+	 throw OutletSchemaBuilderException::createWithPattern(OutletSchemaBuilderException::ERROR_NO_FILE_NAME_GIVEN);
+      }
    }
 }

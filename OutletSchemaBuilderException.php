@@ -20,6 +20,7 @@
 class OutletSchemaBuilderException extends  Exception{
 
    const ERROR_CONSTRUCTOR_LOCKED = 'You need to call the create method';
+   const ERROR_NO_FILE_NAME_GIVEN='You need to give a file name, empty strings are not allowed';
    private $pattern;
    private $parameters;
 

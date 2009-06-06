@@ -20,6 +20,7 @@ require_once (dirname(__FILE__).'/config.php');
 require_once (ROOT_PATH.'/DatabaseDescriptor.php');
 require_once (ROOT_PATH.'/DatabaseDescriptorImpl.php');
 require_once (ROOT_PATH.'/PdoHandler.php');
+require_once (ROOT_PATH.'/OutletSchemaBuilderException.php');
 
 
 class DatabaseDesriptorTestCase extends PHPUnit_Framework_TestCase{
@@ -68,6 +69,16 @@ class DatabaseDesriptorTestCase extends PHPUnit_Framework_TestCase{
 	 ->will($this->returnCallback(array($this, 'handleCreateMemberQuery')));
       $databaseDescriptor = DatabaseDescriptorImpl::createWithPdoHandler($this->getPdoMock());
       $this->assertEquals($this->memberDefinition, $databaseDescriptor->showCreateTable('member'));
+   }
+
+   function testShowCreateTableExpectsANonEmptyStringAsTableName(){
+      $databaseDescriptor = DatabaseDescriptorImpl::createWithPdoHandler($this->getPdoMock());
+      try{
+	 $databaseDescriptor->showCreateTable('');
+      }catch(OutletSchemaBuilderException $e){
+	 return;
+      }
+      $this->fail("Expecting an OutletSchemaBuilderException to be thrown, With pattern: ".OutletSchemaBuilderException::ERROR_NO_FILE_NAME_GIVEN);
    }
 
    function testGetConnectionArray(){
