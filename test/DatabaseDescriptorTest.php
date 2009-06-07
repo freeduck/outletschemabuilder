@@ -100,8 +100,8 @@ class DatabaseDesriptorTestCase extends PHPUnit_Framework_TestCase{
    function handleTablesQuery($query){
       $result = array();
       if("show tables" == strtolower($query)){
-	 $result[] = array("Tables_in_mysql" => 'member');
-	 $result[] = array("Tables_in_mysql" => 'player');
+	 $result[] = array(0 => 'member', "Tables_in_mysql" => 'member');
+	 $result[] = array(0 => 'player', "Tables_in_mysql" => 'player');
       }
       return $result;
    }

@@ -44,7 +44,7 @@ class DatabaseDescriptorImpl implements DatabaseDescriptor{
       $tableNames = array();
       $result = $this->pdoHandler->query("SHOW TABLES");
       foreach($result as $row){
-	 $tableNames[] = $row['Tables_in_mysql'];
+	 $tableNames[] = $row[0];
       }
       return $tableNames;
    }
