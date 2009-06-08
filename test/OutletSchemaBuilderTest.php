@@ -31,8 +31,7 @@ class OutletSchemaBuilderTestCase extends PHPUnit_Framework_TestCase{
 
       $this->connectionArray = array('dsn' => 'mysql:host=localhost;dbname=rvunited',
 				     'username' => 'root',
-				     'password' => 'rootpass',
-				     'dialect'  => 'mysql');
+				     'password' => 'rootpass');
 
       $this->memberDefinition ="CREATE TABLE `member` (
  `id` int(11) NOT NULL auto_increment,
@@ -56,9 +55,12 @@ class OutletSchemaBuilderTestCase extends PHPUnit_Framework_TestCase{
 
    }
    function testGivenADatabaseObjectTheBuilderReturnsAOutletSchemaArray(){
-      $builder = OutletSchemaBuilder::createWithDatabase($this->getDatabaseMock());
+      $builder = OutletSchemaBuilder::createWithDatabase($this->getDatabaseMock(), 'sqlite');
       $schema = $builder->createSchema();
-      $this->assertEquals($this->connectionArray, $schema['connection']);
+      $connectionArray = $this->connectionArray;
+      $connectionArray['dialect'] = 'sqlite';
+      var_dump($schema['connection']);
+      $this->assertEquals($connectionArray, $schema['connection']);
       $this->assertEquals(2, count($schema['classes']));
       $classNameArray = array_keys($schema['classes']);
       $this->assertTrue(in_array('Member', $classNameArray), "Member is not in class schema");

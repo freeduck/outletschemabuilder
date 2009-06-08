@@ -19,20 +19,22 @@
 
 class OutletSchemaBuilder{
    private $database;
+   private $dialect;
    private $schema;
    private $tableDefinition;
    private $tableName;
    private $className;
    private $mysqlOutletTypeMap;
 
-   function createWithDatabase($database){
+   function createWithDatabase($database, $dialect){
       $builder = new OutletSchemaBuilder();
-      $builder->initializeWithDatabase($database);
+      $builder->initializeWithDatabase($database, $dialect);
       return $builder;
    }
 
-   protected function initializeWithDatabase($database){
+   protected function initializeWithDatabase($database, $dialect){
       $this->database = $database;
+      $this->dialect = $dialect;
       $this->schema = array();
       $this->tableDefinition = array();
       $this->mysqlOutletTypeMap = array('varchar' => 'varchar', 'text' => 'varchar', 'int' => 'int', 'datetime' => 'datetime');
@@ -46,6 +48,7 @@ class OutletSchemaBuilder{
 
    function addConnection(){
       $this->schema['connection'] = $this->database->getConnectionArray();
+      $this->schema['connection']['dialect'] = $this->dialect;
    }
 
    function addClassDefinitions(){
