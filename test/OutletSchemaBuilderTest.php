@@ -59,7 +59,6 @@ class OutletSchemaBuilderTestCase extends PHPUnit_Framework_TestCase{
       $schema = $builder->createSchema();
       $connectionArray = $this->connectionArray;
       $connectionArray['dialect'] = 'sqlite';
-      var_dump($schema['connection']);
       $this->assertEquals($connectionArray, $schema['connection']);
       $this->assertEquals(2, count($schema['classes']));
       $classNameArray = array_keys($schema['classes']);
@@ -106,7 +105,7 @@ class OutletSchemaBuilderTestCase extends PHPUnit_Framework_TestCase{
       $this->assertEquals('player', $playerArray['table']);
       $this->assertEquals(array('member_id', 'int', array('pk'=>true, 'autoIncrement'=>true)), $playerArray['props']['memberId']);
       $this->assertEquals(array('number', 'int'), $playerArray['props']['number']);
-      $this->assertEquals(array(array('one-to-one', 'memberId')), $playerArray['associations']);
+      $this->assertEquals(array(array('one-to-one', 'Member', array('key', 'memberId'))), $playerArray['associations']);
    }
 
    function showCreateTable($tableName){

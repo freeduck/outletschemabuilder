@@ -153,12 +153,16 @@ class OutletSchemaBuilder{
 	 $this->schema['classes'][$this->className]['props'][$this->camelCase($pk)][] = array('pk'=>true, 'autoIncrement'=>true);
       }
       else{
-	 $foreignStart = strpos($columnLine, "FOREIGN KEY");
-	 $foreignEnd = strpos($columnLine, ")", $foreignStart);
-	 $localAttPart = substr($columnLine, $foreignStart, $foreignEnd - $foreignStart);
+	 $localStart = strpos($columnLine, "FOREIGN KEY");
+	 $localEnd = strpos($columnLine, ")", $localStart);
+	 $localAttPart = substr($columnLine, $localStart, $localEnd - $localStart);
+	 $foreignPart = substr($columnLine, $localEnd);
+	 $foreignClassName = ucfirst($this->camelCase($this->extractIdentifierName($foreignPart)));
 	 $this->schema['classes'][$this->className]['associations'] = array(array(
 										  'one-to-one', 
-										  $this->extractIdentifierName($this->camelCase($localAttPart))));
+										  $foreignClassName,
+										  array('key',
+											$this->camelCase($this->extractIdentifierName($localAttPart)))));
       }
    }
 }
